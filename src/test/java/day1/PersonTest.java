@@ -2,12 +2,35 @@ package day1;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.time.Duration;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class PersonTest {
-    Person person;
-    Person spouse;
+    private Person person;
+    private Person spouse;
+
+    static Stream provideValidEmail() {
+        return Stream.of("jan.kowalski@szkolenie.pl", "jan@szkolenie.pl", "jan@szkolenie.com");
+    }
+
+    static Stream provideEmails() {
+        return Stream.of(
+                Arguments.of("jan.kowalski@szkolenie.pl", true),
+                Arguments.of("jan@szkolenie.pl", true),
+                Arguments.of("jan@szkolenie.com", true),
+                Arguments.of("jan.kowalski.szkolenie.pl", false),
+                Arguments.of("@szkolenie.pl", false),
+                Arguments.of("jan.kowalski@", false)
+        );
+    }
 
     @BeforeEach
     void setUp() {
@@ -104,4 +127,91 @@ public class PersonTest {
         // Assert / Then
         assertNull(spouse.getSpouse());
     }
+
+    @Test
+    void personShouldEarnSomeMoney() {
+        person.earn(1000);
+
+        assertEquals(1000, person.getMoney());
+    }
+
+    @Test
+    void personShouldEarnMuchMoney() {
+        person.earn(1000);
+        person.earn(2000);
+        person.earn(3000);
+
+        assertEquals(6000, person.getMoney());
+    }
+
+    @Test
+    void personShouldNotEarnMinusMoney() {
+        Exception exception = assertThrows(MinusMoneyException.class, () -> {
+            person.earn(-1000);
+        });
+        assertEquals("No minus money -> :( ", exception.getMessage());
+    }
+
+    @Test
+    void personShouldEarnMoneyAferWork() {
+        assertTimeout(Duration.ofMillis(1000), () -> {
+            person.work(100, 300);
+        });
+
+//        assertTimeoutPreemptively(Duration.ofMillis(1000), () -> {
+//            person.work(10000, 300);
+//        });
+
+        assertEquals(300, person.getMoney());
+    }
+
+    @Test
+    void testSomethingWithAssume() {
+        System.setProperty("ENV", "PROD");
+
+        assumeTrue(System.getProperty("ENV").equals("PROD"));
+
+        assertTrue(true);
+    }
+
+    @Test
+    void emailShouldBeValid() {
+        person.setEmail("jan.kowalski@szkolenie.pl");
+
+        assertTrue(person.isEmailValid());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"jan.kowalski@szkolenie.pl", "jan@szkolenie.pl", "jan@szkolenie.com"})
+    void emailsShouldBeValid(String email) {
+        person.setEmail(email);
+
+        assertTrue(person.isEmailValid());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"jan.kowalski.szkolenie.pl", "@szkolenie.pl", "jan.kowalski@"})
+    void emailsShouldNotBeValid(String email) {
+        person.setEmail(email);
+
+        assertFalse(person.isEmailValid());
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "provideEmails")
+    void checkEmailCorrections(String email, boolean expectedValidaition) {
+        person.setEmail(email);
+
+        assertEquals(expectedValidaition, person.isEmailValid());
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "provideValidEmail")
+    void emailsShouldByValidByMethodSource(String email) {
+        person.setEmail(email);
+
+        assertTrue(person.isEmailValid());
+    }
+
+
 }
