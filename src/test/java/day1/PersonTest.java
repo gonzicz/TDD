@@ -1,20 +1,27 @@
 package day1;
 
-import day1.Person;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PersonTest {
+    Person person;
+    Person spouse;
+
+    @BeforeEach
+    void setUp() {
+        person = new Person("Jan Kowalski");
+        spouse = new Person("Alicja Nowak");
+    }
+
     @Test
     void constructorShouldSetName() {
-        Person person = new Person("Jan Kowalski");
         assertEquals("Jan Kowalski", person.getName());
     }
 
     @Test
     void personShouldChild() {
-        Person person = new Person("Jan Kowalski");
         Person child = new Person("Adam Kowalski");
 
         person.addChild(child);
@@ -24,9 +31,6 @@ public class PersonTest {
 
     @Test
     void personShouldHaveSpouse() {
-        Person person = new Person("Jan Nowak");
-        Person spouse = new Person("Alicja Nowak");
-
         person.marriage(spouse);
 
         assertNotNull(person.getSpouse());
@@ -34,8 +38,6 @@ public class PersonTest {
 
     @Test
     void personShouldNotHaveAnotherSpouse() {
-        Person person = new Person("Jan Nowak");
-        Person spouse = new Person("Alicja Nowak");
         Person lover = new Person("Beata K");
 
         person.marriage(spouse);
@@ -47,9 +49,6 @@ public class PersonTest {
 
     @Test
     void spouseShouldHaveSpouse() {
-        Person person = new Person("Jan Nowak");
-        Person spouse = new Person("Alicja Nowak");
-
         person.marriage(spouse);
 
         assertEquals(person, spouse.getSpouse());
@@ -57,8 +56,6 @@ public class PersonTest {
 
     @Test
     void loverShouldNotMarriageMarriedPerson() {
-        Person person = new Person("Jan Nowak");
-        Person spouse = new Person("Alicja Nowak");
         Person lover = new Person("Beata K");
 
         person.marriage(spouse);
@@ -72,9 +69,6 @@ public class PersonTest {
 
     @Test
     void personShouldNotBeMarriedWithAnotherOne() {
-        Person person = new Person("Jan Nowak");
-        Person spouse = new Person("Alicja Nowak");
-
         person.marriage(spouse);
 
         assertFalse(person.isMarriedWithAnotherPerson(spouse));
@@ -82,8 +76,6 @@ public class PersonTest {
 
     @Test
     void personShouldBeMarriedWithAnotherOne() {
-        Person person = new Person("Jan Nowak");
-        Person spouse = new Person("Alicja Nowak");
         Person lover = new Person("Kasia W");
 
         person.marriage(spouse);
@@ -92,10 +84,7 @@ public class PersonTest {
     }
 
     @Test
-    void personShouldNotHaveSpouseAfetrDivorce(){
-        Person person = new Person("Jan Nowak");
-        Person spouse = new Person("Alicja Nowak");
-
+    void personShouldNotHaveSpouseAfetrDivorce() {
         person.marriage(spouse);
         person.divorce();
 
@@ -103,13 +92,16 @@ public class PersonTest {
     }
 
     @Test
-    void spouseShouldNotHaveSpouseAfterDivorce(){
-        Person person = new Person("Jan Nowak");
-        Person spouse = new Person("Alicja Nowak");
+    void spouseShouldNotHaveSpouseAfterDivorce() {
+        // Arrange / Given
+//        Person person = new Person("Jan Nowak");
+//        Person spouse = new Person("Alicja Nowak");
 
+        // Act / When
         person.marriage(spouse);
         person.divorce();
 
+        // Assert / Then
         assertNull(spouse.getSpouse());
     }
 }

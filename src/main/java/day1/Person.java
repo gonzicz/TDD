@@ -38,8 +38,11 @@ public class Person {
     }
 
     public void divorce(){
+        Person ex = this.spouse;
         this.spouse = null;
-        spouse.divorce();
+        if(ex.getSpouse() != null){
+            ex.divorce();
+        }
     }
 
     public boolean isMarriedWithAnotherPerson(Person personToCheck) {
